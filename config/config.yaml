@@ -1,16 +1,34 @@
+logging:
+  level: info
+  file: logs/recormotion.log
 video:
-  input: /home/tobi/Downloads/concat.mp4 # or device
-  max_fps: 25
-  buffer_size: 100
-  resolution:
-    width: 1280
-    height: 720
+  input:
+    source: /home/tobi/Downloads/concat.mp4 # or device
+    max_fps: &fps 25
+    buffer_size: 100
+    resolution: &resolution
+      width: 1280
+      height: 720
+
+  output:
+    folder: /home/tobi/Downloads
+    filename: "%Y-%m-%d-%H-%M-%S.mp4"
+    encoder: libx264
+    resolution: *resolution
+    fps: *fps
+    ffmpeg_args:
+      - -preset
+      - veryfast
+      - -crf
+      - 19
 detection:
   debug: True
   torchserve_url: http://server:50080/predictions/fcos_resnet50
   sampling_rate: 2
+  trigger_detection_threshold: 0.5
+  trigger_invalidate_duration: 10
   trigger_classes:
-    - person
+    # - person
     - bird
     - cat
     - dog

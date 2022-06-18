@@ -1,8 +1,14 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from omegaconf import OmegaConf
+
+
+@dataclass
+class Logging:
+    level: str = "info"
+    file: Optional[str] = None
 
 
 @dataclass
@@ -12,11 +18,27 @@ class Resolution:
 
 
 @dataclass
-class Video:
-    input: Union[str, int]
+class VideoInput:
+    source: Union[str, int]
     max_fps: int
     resolution: Resolution
     buffer_size: int
+
+
+@dataclass
+class VideoOutput:
+    folder: str
+    resolution: Resolution
+    filename: str = "%Y-%m-%d-%H:%M:%S.mp4"
+    encoder: str = "libx264"
+    fps: int = 25
+    ffmpeg_args: Optional[List[str]] = None
+
+
+@dataclass
+class Video:
+    input: VideoInput
+    output: VideoOutput
 
 
 @dataclass
@@ -25,16 +47,19 @@ class Detection:
     labels: Dict[int, str]
     sampling_rate: int = 2
     debug: bool = False
+    trigger_detection_threshold: float = 0.6
+    trigger_invalidate_duration: int = 10
     trigger_classes: List[str] = field(default_factory=lambda: [])
 
 
 @dataclass
 class Config:
+    logging: Logging
     video: Video
     detection: Detection
 
 
-class Configuration(object):
+class Configuration:
     _instance = None
 
     def __new__(cls):

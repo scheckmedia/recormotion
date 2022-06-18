@@ -7,7 +7,9 @@ from flask import Flask, Response, request
 from recormotion.buffer import CaptureBuffer
 from recormotion.config import Configuration
 from recormotion.detector import RemoteMotionDetector
+from recormotion.helper import setup_logger
 
+setup_logger()
 app = Flask(__name__)
 cfg = Configuration().config
 
