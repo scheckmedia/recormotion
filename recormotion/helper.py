@@ -5,6 +5,7 @@ from recormotion.config import Configuration
 
 
 def setup_logger():
+    """Helper function to setup file and stream logging for the applicationk"""
     cfg = Configuration().config.logging
     level = logging.getLevelName(cfg.level.upper())
 

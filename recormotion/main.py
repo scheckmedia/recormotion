@@ -1,4 +1,5 @@
 import time
+from typing import Iterator
 
 import cv2
 import numpy as np
@@ -20,6 +21,7 @@ detector = RemoteMotionDetector(capture_buffer)
 
 @app.route("/")
 def root():
+    """Default route to show the current mjpeg stream"""
     detector.debug = request.args.get("debug", False)
 
     return """
@@ -29,9 +31,15 @@ def root():
     """
 
 
-def gather_img():
+def gather_img() -> Iterator[bytes]:
+    """Function to generate a mjpeg valid stream based on raw images
+
+    :yield: iterator that holds a mjpeg frame
+    :rtype: Iterator[bytes]
+    """
     while True:
-        time.sleep(0.1)
+        time.sleep(1 / cfg.video.output.fps)
+        # time.sleep(0.1)
         if detector.debug:
             img = detector.frame
         else:
@@ -50,7 +58,12 @@ def gather_img():
 
 
 @app.route("/mjpeg")
-def mjpeg():
+def mjpeg() -> Response:
+    """entry point for mjpeg stream
+
+    :return: http response with mjpeg stream
+    :rtype: Response
+    """
     return Response(gather_img(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
