@@ -201,7 +201,8 @@ class FfmpegWrite:
                 )
                 self._pipe_out.write(frame.tobytes())
                 logger.debug("write frame")
-
+        with self._queue.mutex:
+            self._queue.queue.clear()
         logger.info("stop recording")
 
     def write(self, frame: np.ndarray):

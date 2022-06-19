@@ -6,8 +6,8 @@ import cv2
 import numpy as np
 import requests
 
-from recormotion.buffer import CaptureBuffer
 from recormotion.config import Configuration
+from recormotion.io import CaptureBuffer
 from recormotion.utils import Visualizer
 
 logger = getLogger(__file__)
@@ -32,7 +32,6 @@ class RemoteMotionDetector:
         self._debug = self._cfg.debug
         self._last_frame = None
         self._last_match = 0
-        self._invalidate_duration_ns = self._cfg.trigger_invalidate_duration * 1e9
         self._wait_time = 1 / self._cfg.sampling_rate
 
         self._visualizer = Visualizer(self._cfg.labels)
@@ -104,14 +103,19 @@ class RemoteMotionDetector:
                     self._last_match,
                     self._buffer.recording,
                 )
-                self._last_match = time.time_ns()
+                self._last_match = time.time()
                 self._buffer.recording = True
 
             if self._buffer.recording:
-                match_delta = time.time_ns() - self._last_match
-                if match_delta >= self._invalidate_duration_ns:
+                match_delta = time.time() - self._last_match
+                logger.debug(
+                    "match_delta: %s, exceeded: %r",
+                    match_delta,
+                    match_delta >= self._cfg.trigger_invalidate_duration,
+                )
+                if match_delta >= self._cfg.trigger_invalidate_duration:
                     self._buffer.recording = False
-                    logger.info("stop recording, last trigger duration outdated")
+                    logger.info("stop recording, last trigger duration exceeded")
 
     def _detections_has_trigger(self, detections):
         logger.debug("Parse and process %d detections", len(detections))

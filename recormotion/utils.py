@@ -113,8 +113,8 @@ class Visualizer:
         :return: image with the timecode drawn
         :rtype: np.ndarray
         """
-        camera = Configuration().config.video.input.source
-        camera = "camera {camera}" if isinstance(camera, int) else camera
+        source = Configuration().config.video.input.source
+        camera = f"camera {source}" if isinstance(source, int) else f"{source}"
         dt = datetime.now()
         date_string = dt.strftime("%Y-%m-%d")
         time_string = dt.strftime("%H:%M:%S.%f")[:-3]

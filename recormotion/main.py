@@ -5,10 +5,10 @@ import cv2
 import numpy as np
 from flask import Flask, Response, request
 
-from recormotion.buffer import CaptureBuffer
 from recormotion.config import Configuration
 from recormotion.detector import RemoteMotionDetector
 from recormotion.helper import setup_logger
+from recormotion.io import CaptureBuffer
 
 setup_logger()
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def gather_img() -> Iterator[bytes]:
     """
     while True:
         time.sleep(1 / cfg.video.output.fps)
-        # time.sleep(0.1)
+
         if detector.debug:
             img = detector.frame
         else:
