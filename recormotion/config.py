@@ -6,6 +6,16 @@ from omegaconf import OmegaConf
 
 
 @dataclass
+class Http:
+    """Dataclass that holds settings for Flask"""
+
+    host: str = "0.0.0.0"
+    port: int = 80
+    debug: bool = False
+    threaded: bool = True
+
+
+@dataclass
 class Logging:
     """Dataclass representing logging settings
 
@@ -127,6 +137,7 @@ class Detection:
 class Config:
     """dataclass that holds the application settings"""
 
+    http: Http
     logging: Logging
     video: Video
     detection: Detection

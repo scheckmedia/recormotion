@@ -26,7 +26,7 @@ def root():
 
     return """
     <body style="background: black;">
-        <img src="/mjpeg" />
+        <img src="/" />
     </body>
     """
 
@@ -67,4 +67,4 @@ def mjpeg() -> Response:
     return Response(gather_img(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
-app.run(host="0.0.0.0", threaded=True)
+app.run(**cfg.http)
