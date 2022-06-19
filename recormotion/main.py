@@ -19,7 +19,7 @@ capture_buffer = CaptureBuffer()
 detector = RemoteMotionDetector(capture_buffer)
 
 
-@app.route("/")
+@app.route("/stream")
 def root():
     """Default route to show the current mjpeg stream"""
     detector.debug = request.args.get("debug", False)
@@ -57,7 +57,7 @@ def gather_img() -> Iterator[bytes]:
         )
 
 
-@app.route("/mjpeg")
+@app.route("/")
 def mjpeg() -> Response:
     """entry point for mjpeg stream
 
