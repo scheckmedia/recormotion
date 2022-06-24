@@ -57,8 +57,8 @@ class CaptureBuffer:
     def frame(self) -> np.ndarray:
         """Getter for current captured frame
 
-        :return: Current frame in the buffer
-        :rtype: np.ndarray
+        Returns:
+            np.ndarray: Current frame in the buffer
         """
 
         with self._lock:
@@ -72,8 +72,8 @@ class CaptureBuffer:
     def recording(self) -> bool:
         """Getter for current recording state
 
-        :return: Recording state, if true the frames will be recorded
-        :rtype: bool
+        Returns:
+            bool: Recording state, if true the frames will be recorded
         """
         return self._recording
 
@@ -85,8 +85,8 @@ class CaptureBuffer:
         is copied first to the write buffer otherwsie the recording
         stops
 
-        :param value: recording state
-        :type value: bool
+        Args:
+            value (bool): recording state
         """
         if not value:
             self._write_buffer.stop()
@@ -210,8 +210,8 @@ class FfmpegWrite:
         If the stream is not opened yet, this will be
         done first
 
-        :param frame: frame / image to write into the video stream
-        :type frame: np.ndarray
+        Args:
+            frame (np.ndarray): frame / image to write into the video stream
         """
         if not self._recording:
             self._recording = True

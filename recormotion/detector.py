@@ -17,8 +17,8 @@ class RemoteMotionDetector:
     """Object that handles motion detection using TorchServe to
     detect objects of interesets that triggers a recording.
 
-    :param buffer: buffer object that produces frames and handles recording
-    :type buffer: CaptureBuffer
+    Args:
+        buffer (CaptureBuffer): buffer object that produces frames and handles recording
     """
 
     def __init__(self, buffer: CaptureBuffer):
@@ -43,8 +43,8 @@ class RemoteMotionDetector:
     def debug(self) -> bool:
         """Getter of debugging state
 
-        :return: true if debugging is active otherwise false
-        :rtype: bool
+        Returns:
+            bool: true if debugging is active otherwise false
         """
         return self._debug
 
@@ -54,8 +54,8 @@ class RemoteMotionDetector:
         If debugging is enabled, bounding boxes and
         labels of potential trigger objects will be shown
 
-        :param value: debug state
-        :type value: bool
+        Args:
+            value (bool): debug state
         """
         self._debug = value
 
@@ -64,8 +64,8 @@ class RemoteMotionDetector:
         """Getter to read the current frame from the motion detection
         where an trigger event occured
 
-        :return: frame where a trigger event occured
-        :rtype: np.ndarray
+        Returns:
+            np.ndarray: frame where a trigger event occured
         """
         return self._last_frame
 

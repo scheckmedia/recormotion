@@ -19,10 +19,9 @@ class Http:
 class Logging:
     """Dataclass representing logging settings
 
-    :param level: log level, see python docs for possible values
-    :type level: str
-    :param file: log file path
-    :type file: Optional[str]
+    Args:
+        level (str): log level, see python docs for possible values
+        file (Optional[str]): log file path
     """
 
     level: str = "info"
@@ -33,10 +32,9 @@ class Logging:
 class Resolution:
     """Dataclass that represents settings for a  video resolution
 
-    :param width: width of the input / output video
-    :type width: int
-    :param height: height of the input / output video
-    :type height: int
+    Args:
+        width (int): width of the input / output video
+        height (int): height of the input / output video
     """
 
     width: int = 1280
@@ -47,18 +45,13 @@ class Resolution:
 class VideoInput:
     """Dataclass that represents settings for video / stream input
 
-    :param source: source of the video, could be file path or device number
-    :type source: Union[str, int]
-    :param max_fps: max number of FPS to read from a stream file
-    :type max_fps: int
-    :param resolution: input resolution to request from a video device
-    :type resolution: Resolution
-    :param buffer_size: numbr of frames to buffer to have a history before a trigger occurs
-    :type buffer_size: int
-    :param timecode: enable/disable a timecode in the video frame
-    :type timecode: bool
-    :param fourcc: additiona fourcc code for OpenCV to request from a video device
-    :type fourcc: str
+    Args:
+        source (Union[str, int]): source of the video, could be file path or device number
+        max_fps (int): max number of FPS to read from a stream file
+        resolution (Resolution): input resolution to request from a video device
+        buffer_size (int): numbr of frames to buffer to have a history before a trigger occurs
+        timecode (bool): enable/disable a timecode in the video frame
+        fourcc (str): additiona fourcc code for OpenCV to request from a video device
     """
 
     source: Union[str, int]
@@ -73,19 +66,14 @@ class VideoInput:
 class VideoOutput:
     """Dataclass that represents video output settings
 
-    :param folder: folder a trigger event video should be save in
-    :type folder: str
-    :param resolution: resolution of the output video
-    :type resolution: Resolution
-    :param filename: filename of the recording, can contain strftime formatter
-    :type filename: str
-    :param encoder: ffmpeg encoder to use for writing the video
-                    on a RPI this should be h264_v4l2m2m for hardware encoding
-    :type encoder: str
-    :param fps: FPS of the output video
-    :type fps: int
-    :param ffmpeg_args: additional ffmpeg args like `-preset veryfast` for libx264
-    :type ffmpeg_args: Optional[List[str]]
+    Args:
+        folder (str): folder a trigger event video should be save in
+        resolution (Resolution): resolution of the output video
+        filename (str): filename of the recording, can contain strftime formatter
+        encoder (str): ffmpeg encoder to use for writing the video
+                        on a RPI this should be h264_v4l2m2m for hardware encoding
+        fps (int): FPS of the output video, if -1 or 0 the average frame rate of the input stream will be used
+        ffmpeg_args (Optional[List[str]]): additional ffmpeg args like `-preset veryfast` for libx264
     """
 
     folder: str
@@ -108,20 +96,14 @@ class Video:
 class Detection:
     """Dataclass that holds settings for the motion detection
 
-    :param torchserve_url: URL to the torchserve entry point e.g. http://ip:port/predictions/modelname
-    :type torchserve_url: str
-    :param labels:
-    :type labels: Dict[int,str]
-    :param sampling_rate:
-    :type sampling_rate: int
-    :param debug: falg to signal debugging mode, what will result in all detections will be visible in a frame
-    :type debug: int
-    :param trigger_detection_threshold: minimum score a detection should have to be valid
-    :type trigger_detection_threshold: int
-    :param trigger_invalidate_duration: number of seconds without a trigger detection until the recording stops
-    :type trigger_invalidate_duration: int
-    :param trigger_classes: List of potential class names that triggers an recording event
-    :type trigger_classes: List[str]
+    Args:
+        torchserve_url (str): URL to the torchserve entry point e.g. http://ip:port/predictions/modelname
+        labels (Dict[int,str]): label list to decode the dection ids into class names
+        sampling_rate (int): frequence how often in a second detections from TorchServe will be requested
+        debug (int): flag to signal debugging mode, what will result in all detections will be visible in a frame
+        trigger_detection_threshold (int): minimum score a detection should have to be valid
+        trigger_invalidate_duration (int): number of seconds without a trigger detection until the recording stops
+        trigger_classes (List[str]): List of potential class names that triggers an recording event
     """
 
     torchserve_url: str
@@ -163,7 +145,7 @@ class Configuration:
     def config(self) -> Config:
         """Getter for access the application configuration
 
-        :return: application configuration
-        :rtype: Config
+        Retruns:
+            Config: application configuration
         """
         return self._config

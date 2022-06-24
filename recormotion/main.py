@@ -34,8 +34,8 @@ def root():
 def gather_img() -> Iterator[bytes]:
     """Function to generate a mjpeg valid stream based on raw images
 
-    :yield: iterator that holds a mjpeg frame
-    :rtype: Iterator[bytes]
+    Yields:
+        Iterator[bytes]: iterator that holds a mjpeg frame
     """
     while True:
         time.sleep(1 / cfg.video.output.fps)
@@ -61,8 +61,8 @@ def gather_img() -> Iterator[bytes]:
 def mjpeg() -> Response:
     """entry point for mjpeg stream
 
-    :return: http response with mjpeg stream
-    :rtype: Response
+    Returns:
+        Response: http response with mjpeg stream
     """
     return Response(gather_img(), mimetype="multipart/x-mixed-replace; boundary=frame")
 

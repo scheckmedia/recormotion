@@ -13,8 +13,8 @@ cm = get_cmap("rainbow")
 class Visualizer:
     """Simple visualization object to provide drawing functionality
 
-    :param labels: Label mapping of all possible detections key is the id and value the class name
-    :type labels: Dict[int, str]
+    Args:
+        labels (Dict[int, str]): Label mapping of all possible detections key is the id and value the class name
     """
 
     def __init__(self, labels: Dict[int, str]) -> None:
@@ -37,22 +37,17 @@ class Visualizer:
     ) -> np.ndarray:
         """Helper function to draw bounding boxes around for a detection into a frame
 
-        :param img: image to draw the detection
-        :type img: np.ndarray
-        :param class_name: name of the class the detection belongs to
-        :type class_name: str
-        :param x1: top left x postion of the bounding box
-        :type x1: int
-        :param y1: top left y position of the bounding box
-        :type y1: int
-        :param x2: bottom right x position of the bounding box
-        :type x2: int
-        :param y2: bottom right y position of the bounding box
-        :type y2: int
-        :param thickness: thicknes for the bounding box line, defaults to 2
-        :type thickness: int, optional
-        :return: image containing the visualized bounding box
-        :rtype: np.ndarray
+        Args:
+            img (np.ndarray): image to draw the detection
+            class_name (str): name of the class the detection belongs to
+            x1 (int): top left x postion of the bounding box
+            y1 (int): top left y position of the bounding box
+            x2 (int): bottom right x position of the bounding box
+            y2 (int): bottom right y position of the bounding box
+            thickness (int, optional): thicknes for the bounding box line, defaults to 2. Defaults to 2.
+
+        Returns:
+            np.ndarray: image containing the visualized bounding box
         """
         color = self._color_mapping[class_name]
         return cv2.rectangle(img, (x1, y1), (x2, y2), color, thickness)
@@ -60,12 +55,12 @@ class Visualizer:
     def draw_legend(self, img: np.ndarray, detected_classes: set) -> np.ndarray:
         """Function to draw a legend for a list of detections
 
-        :param img: image the legend should be drawn
-        :type img: np.ndarray
-        :param detected_classes: classes that should be part of the legend
-        :type detected_classes: set
-        :return: image with the drawn legend
-        :rtype: np.ndarray
+        Args:
+            img (np.ndarray): image the legend should be drawn
+            detected_classes (set):  classes that should be part of the legend
+
+        Returns:
+            np.ndarray: image with the drawn legend
         """
         padding = 5
         x1 = y1 = padding
@@ -108,10 +103,11 @@ class Visualizer:
         The timecode contains the source of the frame (device or file),
         the date in format 2022-06-19 and the time 11:32:50.003
 
-        :param img: image to draw the timecode
-        :type img: np.ndarray
-        :return: image with the timecode drawn
-        :rtype: np.ndarray
+        Args:
+            img (np.ndarray): image to draw the timecode
+
+        Returns:
+            np.ndarray: image with the timecode drawn
         """
         source = Configuration().config.video.input.source
         camera = f"camera {source}" if isinstance(source, int) else f"{source}"
