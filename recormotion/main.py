@@ -38,7 +38,7 @@ def gather_img() -> Iterator[bytes]:
         Iterator[bytes]: iterator that holds a mjpeg frame
     """
     while True:
-        time.sleep(1 / cfg.video.output.fps)
+        time.sleep(1 / capture_buffer.output_fps)
 
         if detector.debug:
             img = detector.frame
@@ -64,6 +64,7 @@ def mjpeg() -> Response:
     Returns:
         Response: http response with mjpeg stream
     """
+    detector.debug = request.args.get("debug", False)
     return Response(gather_img(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 

@@ -97,18 +97,21 @@ class RemoteMotionDetector:
             self._last_frame = frame
             detections = res.json()
 
-            if self._detections_has_trigger(detections):
+            detected_classes = self._detection_triggers(detections)
+            if len(detected_classes) > 0:
+                self._last_match = time.time()
                 logger.info(
-                    "trigger detected at %d, already recording: %r",
+                    "trigger for class %s detected at %d, already recording: %r",
+                    detected_classes,
                     self._last_match,
                     self._buffer.recording,
                 )
-                self._last_match = time.time()
+
                 self._buffer.recording = True
 
             if self._buffer.recording:
                 match_delta = time.time() - self._last_match
-                logger.debug(
+                logger.info(
                     "match_delta: %s, exceeded: %r",
                     match_delta,
                     match_delta >= self._cfg.trigger_invalidate_duration,
@@ -117,11 +120,10 @@ class RemoteMotionDetector:
                     self._buffer.recording = False
                     logger.info("stop recording, last trigger duration exceeded")
 
-    def _detections_has_trigger(self, detections):
+    def _detection_triggers(self, detections):
         logger.debug("Parse and process %d detections", len(detections))
 
         detected_classes = set()
-        has_trigger = False
         for detection in detections:
             (class_name, coords), (_, score) = detection.items()
             if (
@@ -130,17 +132,16 @@ class RemoteMotionDetector:
             ):
                 continue
 
-            has_trigger = True
+            detected_classes.add(class_name)
             if self._debug:
                 x1, y1, x2, y2 = [int(x) for x in coords]
                 self._last_frame = self._visualizer.draw_detection(
                     self._last_frame, class_name, x1, y1, x2, y2
                 )
-                detected_classes.add(class_name)
 
         if len(detected_classes) > 0:
             self._last_frame = self._visualizer.draw_legend(
                 self._last_frame, detected_classes
             )
 
-        return has_trigger
+        return detected_classes
