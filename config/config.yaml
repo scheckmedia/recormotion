@@ -33,6 +33,9 @@ detection:
   debug: True
   torchserve_url: http://server:50080/predictions/fcos_resnet50
   sampling_rate: 2
+  max_recording_time: 300
+  trigger_save: True
+  trigger_path: "${video.output.folder}/%Y-%m-%d-%H-%M-%S.jpg"
   trigger_detection_threshold: 0.5
   trigger_invalidate_duration: 10
   trigger_classes:

@@ -55,6 +55,7 @@ class CaptureBuffer:
         self._history_copied = False
 
         self._lock = Lock()
+        self._lock_history = Lock()
         self._t = Thread(target=self._process)
         self._t.start()
 
@@ -102,11 +103,12 @@ class CaptureBuffer:
         Args:
             value (bool): recording state
         """
+        self._recording = value
+
         if not value:
             self._write_buffer.stop()
-            self._history_copied = False
-
-        self._recording = value
+            with self._lock_history:
+                self._history_copied = False
 
     def _copy_buffer_history(self):
         history = []
@@ -119,7 +121,8 @@ class CaptureBuffer:
                 i = (i + 1) % self._buffer_size
 
         logger.debug("copy historic frames to write buffer done")
-        self._history_copied = True
+        with self._lock_history:
+            self._history_copied = True
         return history
 
     def _process(self):
@@ -130,8 +133,6 @@ class CaptureBuffer:
             tick = time.time()
             success, img = self._cam.read()
 
-            logger.debug("capture frame success: %r", success)
-
             if not success:
                 logger.warning("read frame not successful")
                 # invalidate last frame to signal end of stream
@@ -140,15 +141,12 @@ class CaptureBuffer:
                 time.sleep(1)
                 continue
 
-            logger.debug(f"FPS after reading: {1 / (time.time() - tick)}")
             if self._cfg.timecode:
                 img = Visualizer.draw_timecode(img)
-                logger.debug(f"FPS after timecode: {1 / (time.time() - tick)}")
 
             with self._lock:
                 self._buffer_pos = (self._buffer_pos + 1) % self._buffer_size
                 self._buffer[self._buffer_pos] = img
-                logger.debug("update buffer at position %d", self._buffer_pos)
 
             if self._recording:
                 history = None
@@ -156,7 +154,6 @@ class CaptureBuffer:
                     history = self._copy_buffer_history()
 
                 self._write_buffer.write(self.frame, history)
-                logger.debug(f"FPS after write: {1 / (time.time() - tick)}")
 
             self._moving_average.append(1 / (time.time() - tick))
             if len(self._moving_average) >= self._moving_average_size:
@@ -167,7 +164,6 @@ class CaptureBuffer:
                 logger.debug(f"Moving Average FPS: {avg}")
 
             delta = self._max_frame_time - (time.time() - tick)
-            logger.debug(f"FPS delta: {1/delta}")
 
             if delta > 0:
                 logger.debug(f"sleep for {delta} seconds")
@@ -251,28 +247,27 @@ class FfmpegWrite:
             self._pipe_out = p.stdin
 
             if history:
-                logger.info("write history to output stream")
+                tick = time.time()
                 for frame in history:
                     self._prepare_and_write_frame(frame)
                     logger.debug("write history frame")
 
-            while self._recording:
-                try:
-                    frame = self._queue.get_nowait()
-                    self._prepare_and_write_frame(frame)
-                    logger.debug("write frame")
-                except queue.Empty:
-                    time.sleep(0.1)
-
-            logger.info("clear recording queue")
+                logger.info(
+                    f"history written to output stream with { 1 / (time.time() - tick)} FPS"
+                )
 
             while True:
                 try:
                     frame = self._queue.get_nowait()
+                    tick = time.time()
                     self._prepare_and_write_frame(frame)
-                    logger.debug("write remaining frame")
+                    logger.debug(f"write frame with { 1 / (time.time() - tick)} FPS")
                 except queue.Empty:
-                    break
+                    if self._recording:
+                        time.sleep(0.1)
+                    else:
+                        logger.info("recording queue is empty")
+                        break
 
     def write(self, frame: np.ndarray, history: List[np.ndarray] = None):
         """Writes a frame into the active video stream
@@ -281,6 +276,7 @@ class FfmpegWrite:
 
         Args:
             frame (np.ndarray): frame / image to write into the video stream
+            history (List[np.ndarray]): list of historic frames, to be written before frame
         """
 
         if not isinstance(frame, np.ndarray):
@@ -296,6 +292,9 @@ class FfmpegWrite:
 
     def stop(self):
         """Method to stop an active recording"""
+        if not self._recording:
+            return
+
         self._recording = False
         if self._active_thread is not None:
             self._active_thread.join()

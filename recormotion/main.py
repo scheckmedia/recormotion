@@ -48,9 +48,6 @@ def gather_img() -> Iterator[bytes]:
         if not isinstance(img, np.ndarray):
             continue
 
-        if detector.debug:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
         _, frame = cv2.imencode(".jpg", img)
         yield (
             b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame.tobytes() + b"\r\n"

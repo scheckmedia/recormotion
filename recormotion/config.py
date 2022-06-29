@@ -100,7 +100,10 @@ class Detection:
         torchserve_url (str): URL to the torchserve entry point e.g. http://ip:port/predictions/modelname
         labels (Dict[int,str]): label list to decode the dection ids into class names
         sampling_rate (int): frequence how often in a second detections from TorchServe will be requested
+        max_recording_time (int): maximum length in seconds a recording can have
         debug (int): flag to signal debugging mode, what will result in all detections will be visible in a frame
+        trigger_save (str): if enabled, the initial trigger frame and detections will be saved to output folder
+        trigger_path (str): file path were the trigger image will be saved
         trigger_detection_threshold (int): minimum score a detection should have to be valid
         trigger_invalidate_duration (int): number of seconds without a trigger detection until the recording stops
         trigger_classes (List[str]): List of potential class names that triggers an recording event
@@ -109,7 +112,10 @@ class Detection:
     torchserve_url: str
     labels: Dict[int, str]
     sampling_rate: int = 2
+    max_recording_time: int = 5 * 60
     debug: bool = False
+    trigger_save: bool = False
+    trigger_path: str = "%Y-%m-%d-%H:%M:%S.jpg"
     trigger_detection_threshold: float = 0.6
     trigger_invalidate_duration: int = 10
     trigger_classes: List[str] = field(default_factory=lambda: [])
