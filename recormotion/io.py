@@ -283,7 +283,7 @@ class FfmpegWrite:
             logger.error("attempt to write invalid frame of type %s", type(frame))
             return
 
-        self._queue.put(frame)
+        self._queue.put(frame.copy())
 
         if not self._recording and self._active_thread is None:
             self._recording = True

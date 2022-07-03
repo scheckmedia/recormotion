@@ -125,17 +125,22 @@ class RemoteMotionDetector:
                     self._buffer.recording = False
                     logger.info("stop recording")
 
+        logger.info("exit detection thread")
+
     def _get_detections(self, frame):
         _, encoded = cv2.imencode(".jpg", frame)
         try:
+            logger.debug("send request to TorchServe")
             res = requests.post(self._request_uri, files={"data": encoded}, timeout=10)
-
+            logger.debug(
+                "receive response from TorchServe with status code: %d", res.status_code
+            )
             if res.status_code == 200:
                 return res.json()
 
             logger.error("TorchServe error: %s", res.json())
-        except requests.exceptions.Timeout:
-            pass
+        except requests.exceptions.RequestException as ex:
+            logger.warning("TorchServe timeout during connecting %s", ex)
 
         return None
 
